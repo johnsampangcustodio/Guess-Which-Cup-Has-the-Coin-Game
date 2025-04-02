@@ -7,8 +7,8 @@
 
 body {
     font-family: 'Baloo 2', cursive;
-    background-color: #ffebf3; /* Soft pink background */
-    color: #6a4162; /* Darker purple text */
+    background-color: #F1E7E7; /* Updated to new color scheme */
+    color: #825765; /* Darker complementary color */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -19,23 +19,24 @@ body {
 
 .game-container {
     width: 100%;
-    max-width: 390px; /* iPhone 13/14 width */
-    padding: 20px;
-    background-color: #fff7fe; /* Very light pink background */
+    max-width: 450px; /* Increased from 390px for more screen space */
+    padding: 15px;
+    background-color: #FFD0C7; /* Updated to new color scheme */
     border-radius: 20px;
-    box-shadow: 0 8px 24px rgba(253, 167, 223, 0.25);
+    box-shadow: 0 8px 24px rgba(230, 157, 184, 0.25);
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    border: 3px solid #ffd1ec; /* Pink border */
+    gap: 15px;
+    border: 3px solid #E69DB8; /* Updated border color */
 }
 
 h1 {
-    font-size: 1.8rem;
+    font-size: 2rem;
     text-align: center;
-    margin-bottom: 10px;
-    color: #fa86c4; /* Cute pink */
-    text-shadow: 2px 2px 0px #ffebf3;
+    margin-bottom: 5px;
+    color: #E69DB8; /* Updated to new color scheme */
+    text-shadow: 2px 2px 0px #F1E7E7;
+    letter-spacing: 2px;
 }
 
 .game-status {
@@ -43,11 +44,11 @@ h1 {
     justify-content: space-between;
     font-size: 1.1rem;
     font-weight: 600;
-    color: #9771a8; /* Purple */
-    background-color: #fbedff; /* Very light purple background */
+    color: #825765; /* Darker complementary color */
+    background-color: #FFFECE; /* Updated to new color scheme */
     padding: 10px 15px;
     border-radius: 15px;
-    border: 2px dashed #d9bff0; /* Light purple dashed border */
+    border: 2px dashed #E69DB8; /* Updated border color */
 }
 
 .game-area {
@@ -60,13 +61,13 @@ h1 {
 
 #phaser-game {
     width: 100%;
-    height: 300px;
+    height: 400px; /* Increased from 300px for more game space */
     border-radius: 15px;
     overflow: hidden;
     position: relative;
     touch-action: manipulation; /* Prevents browser handling of pinches and zooms */
-    background-color: #fff0f6; /* Light pink */
-    border: 3px solid #ffcae5; /* Medium pink border */
+    background-color: #F1E7E7; /* Updated to new color scheme */
+    border: 3px solid #E69DB8; /* Updated border color */
 }
 
 .controls {
@@ -78,7 +79,7 @@ h1 {
 }
 
 button {
-    background-color: #fa86c4; /* Cute pink */
+    background-color: #E69DB8; /* Updated to new color scheme */
     color: white;
     border: none;
     padding: 12px 24px;
@@ -88,31 +89,31 @@ button {
     cursor: pointer;
     transition: all 0.2s;
     font-family: 'Baloo 2', cursive;
-    box-shadow: 0 4px 0 #e461a5; /* Darker pink for 3D effect */
+    box-shadow: 0 4px 0 #c97d96; /* Darker shade for 3D effect */
 }
 
 button:hover {
-    background-color: #ff9ed2;
+    background-color: #f4adca;
     transform: translateY(-2px);
 }
 
 button:active {
-    background-color: #e461a5;
+    background-color: #c97d96;
     transform: translateY(2px);
-    box-shadow: 0 2px 0 #e461a5;
+    box-shadow: 0 2px 0 #c97d96;
 }
 
 select {
     padding: 12px 15px;
     border-radius: 15px;
-    border: 2px solid #d9bff0; /* Light purple border */
+    border: 2px solid #E69DB8; /* Updated border color */
     font-size: 0.9rem;
-    background-color: #fbedff; /* Very light purple */
+    background-color: #FFFECE; /* Updated to new color scheme */
     cursor: pointer;
     font-family: 'Baloo 2', cursive;
-    color: #6a4162;
+    color: #825765;
     appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239771a8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23E69DB8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 10px center;
     background-size: 1em;
@@ -132,12 +133,12 @@ select {
     z-index: 10;
     transition: opacity 0.3s, transform 0.3s;
     opacity: 0;
-    background-color: rgba(255, 171, 205, 0.95);
+    background-color: rgba(230, 157, 184, 0.95); /* Updated background color */
     color: white;
     pointer-events: none;
     font-size: 1.1rem;
-    box-shadow: 0 4px 15px rgba(253, 167, 223, 0.4);
-    border: 2px solid #ffcae5;
+    box-shadow: 0 4px 15px rgba(230, 157, 184, 0.4);
+    border: 2px solid #FFD0C7; /* Updated border color */
 }
 
 #game-message.visible {
@@ -151,6 +152,15 @@ select {
         box-shadow: none;
         border-radius: 20px;
         min-height: 100vh;
-        padding: 30px 20px;
+        padding: 15px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+        margin-top: 5px;
+    }
+    
+    #phaser-game {
+        height: 350px; /* Slightly smaller on mobile but still larger than original */
     }
 } 

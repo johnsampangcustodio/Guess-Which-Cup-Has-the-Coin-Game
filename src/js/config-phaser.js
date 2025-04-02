@@ -5,9 +5,9 @@
 const CONFIG = {
     // Phaser game configuration
     GAME: {
-        width: 390,
-        height: 300,
-        backgroundColor: 0xfff0f6, // Light pink
+        width: 450,  // Increased to match container width
+        height: 400, // Increased for more game space
+        backgroundColor: 0xF1E7E7, // Updated to new color scheme
         parent: 'phaser-game'
     },
     
@@ -15,64 +15,64 @@ const CONFIG = {
     POINTS_PER_WIN: 10,
     COMBO_MULTIPLIER: 1.5,
     
-    // Animation timing (in milliseconds)
-    SHOW_COIN_TIME: 1800, // Time to show the coin initially
-    PAUSE_BEFORE_SHUFFLE: 600, // Pause before shuffling starts
-    PAUSE_AFTER_SHUFFLE: 400, // Pause after shuffling ends
+    // Animation timing (in milliseconds) - Decreased for faster gameplay
+    SHOW_COIN_TIME: 1200, // Reduced from 1800
+    PAUSE_BEFORE_SHUFFLE: 400, // Reduced from 600
+    PAUSE_AFTER_SHUFFLE: 300, // Reduced from 400
     
-    // Kawaii style
+    // Color scheme
     COLORS: {
-        CUP_PRIMARY: 0xff9bce, // Pink cups
-        CUP_SECONDARY: 0xd162a4, // Darker pink for accents
-        CUP_FACE_BG: 0xffe6f7, // Light pink for face background
-        COIN_PRIMARY: 0xffdf40, // Golden yellow
-        COIN_SECONDARY: 0xff9900, // Orange for accent
-        TABLE: 0xffeeff, // Very light pink table
-        FACE_HAPPY: 0x6a4162, // Dark purple for face
-        FACE_BLUSH: 0xfa86c4 // Pink for blush
+        CUP_PRIMARY: 0xE69DB8, // Updated to new color scheme
+        CUP_SECONDARY: 0xc97d96, // Darker shade for accents
+        CUP_FACE_BG: 0xFFD0C7, // Updated to new color scheme
+        COIN_PRIMARY: 0xFFFECE, // Updated to new color scheme
+        COIN_SECONDARY: 0xF5E7A0, // Darker gold for accent
+        TABLE: 0xF1E7E7, // Updated to new color scheme
+        FACE_HAPPY: 0x825765, // Darker complementary color
+        FACE_BLUSH: 0xE69DB8 // Updated to new color scheme
     },
     
     // Difficulty levels - makes sure all cups are visible in each mode
     DIFFICULTY: {
         1: { // Easy
             NUM_CUPS: 3,
-            SHUFFLE_SPEED: 650, // ms per move
+            SHUFFLE_SPEED: 500, // Faster than before (was 650)
             NUM_SHUFFLES: 5,
             CUP_SCALE: 0.9,
-            CUP_SPACING: 110
+            CUP_SPACING: 130 // Increased for better visibility
         },
         2: { // Medium
             NUM_CUPS: 4,
-            SHUFFLE_SPEED: 550,
+            SHUFFLE_SPEED: 450, // Faster than before (was 550)
             NUM_SHUFFLES: 8,
-            CUP_SCALE: 0.8,
-            CUP_SPACING: 95
+            CUP_SCALE: 0.85, // Slightly larger than before
+            CUP_SPACING: 110 // Increased for better visibility
         },
         3: { // Hard
             NUM_CUPS: 5,
-            SHUFFLE_SPEED: 450,
+            SHUFFLE_SPEED: 400, // Faster than before (was 450)
             NUM_SHUFFLES: 12,
-            CUP_SCALE: 0.7,
-            CUP_SPACING: 78
+            CUP_SCALE: 0.75, // Slightly larger than before
+            CUP_SPACING: 95 // Increased for better visibility
         },
         4: { // Expert
             NUM_CUPS: 6,
-            SHUFFLE_SPEED: 350,
+            SHUFFLE_SPEED: 330, // Faster than before (was 350)
             NUM_SHUFFLES: 15,
-            CUP_SCALE: 0.6,
-            CUP_SPACING: 65
+            CUP_SCALE: 0.65, // Slightly larger than before
+            CUP_SPACING: 75 // Increased for better visibility
         }
     },
     
     // Animation settings
     ANIMATION: {
-        LIFT_DURATION: 300,
-        LOWER_DURATION: 200,
-        CUP_JUMP_HEIGHT: 50,
+        LIFT_DURATION: 250, // Faster than before (was 300)
+        LOWER_DURATION: 150, // Faster than before (was 200)
+        CUP_JUMP_HEIGHT: 60, // Higher jump
         SHUFFLE_EASE: 'Cubic',
         WOBBLE_AMPLITUDE: 10,
-        WOBBLE_DURATION: 800,
-        FACE_BLINK_INTERVAL: [2000, 5000] // Min and max time between blinks
+        WOBBLE_DURATION: 600, // Faster than before (was 800)
+        FACE_BLINK_INTERVAL: [2000, 4000] // Faster blinking (was [2000, 5000])
     },
     
     // Cup dimensions (in pixels)
@@ -91,6 +91,6 @@ const CONFIG = {
     COIN: {
         DIAMETER: 60,
         SPARKLE_SIZE: 10,
-        SPIN_DURATION: 1200
+        SPIN_DURATION: 1000 // Faster than before (was 1200)
     }
 }; 

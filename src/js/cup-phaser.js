@@ -259,7 +259,7 @@ class KawaiiCup extends Phaser.GameObjects.Container {
                 targets: this,
                 scaleX: 1.05,
                 scaleY: 1.05,
-                duration: 200,
+                duration: 150, // Faster than before
                 ease: 'Cubic.Out'
             });
         } else {
@@ -267,7 +267,7 @@ class KawaiiCup extends Phaser.GameObjects.Container {
                 targets: this,
                 scaleX: 1,
                 scaleY: 1,
-                duration: 200,
+                duration: 150, // Faster than before
                 ease: 'Cubic.Out'
             });
         }
@@ -302,7 +302,7 @@ class KawaiiCup extends Phaser.GameObjects.Container {
                 targets: this.coinSparkle,
                 alpha: 0.5,
                 scale: 1.2,
-                duration: 400,
+                duration: 300, // Faster than before
                 yoyo: true,
                 repeat: -1
             });
@@ -372,8 +372,8 @@ class KawaiiCup extends Phaser.GameObjects.Container {
                 }
             },
             ease: 'Sine.InOut',
-            duration: 100,
-            repeat: 5,
+            duration: 80, // Faster wobble
+            repeat: 4,    // Fewer repeats
             onComplete: () => {
                 // Reset position exactly
                 this.x = this.baseX;
@@ -446,7 +446,7 @@ class KawaiiMessage extends Phaser.GameObjects.Container {
             fontFamily: '"Baloo 2", cursive',
             fontSize: '18px',
             color: '#FFFFFF',
-            stroke: '#d162a4',
+            stroke: '#c97d96',
             strokeThickness: 4,
             align: 'center'
         }).setOrigin(0.5);
@@ -461,7 +461,7 @@ class KawaiiMessage extends Phaser.GameObjects.Container {
     /**
      * Show message with text and color
      */
-    show(text, color = 0xff9bce) {
+    show(text, color = 0xE69DB8) {
         // Set text
         this.text.setText(text);
         
@@ -484,7 +484,7 @@ class KawaiiMessage extends Phaser.GameObjects.Container {
             alpha: 1,
             y: this.y - 10,
             scale: 1.05,
-            duration: 300,
+            duration: 250, // Faster than before
             ease: 'Back.Out'
         });
         
@@ -500,7 +500,7 @@ class KawaiiMessage extends Phaser.GameObjects.Container {
             alpha: 0,
             y: this.y + 10,
             scale: 0.9,
-            duration: 200,
+            duration: 150, // Faster than before
             ease: 'Back.In',
             onComplete: () => {
                 this.visible = false;

@@ -3,40 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kawaii Cup and Coin Game</title>
+    <title>CUPS AND COINS</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Phaser -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="src/css/styles.css">
-    <!-- Phaser library -->
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
-    <!-- Google Fonts - Cute font for kawaii style -->
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="game-container">
-        <h1>Kawaii Cup Game</h1>
+    <div class="container">
+        <header>
+            <h1 class="game-title">CUPS AND COINS</h1>
+        </header>
         
-        <div class="game-status">
-            <div id="score">Score: 0</div>
-            <div id="level">Level: 1</div>
-        </div>
-        
-        <div class="game-area">
+        <div class="game-container">
             <div id="phaser-game"></div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label for="difficulty">Difficulty:</label>
+                    <select id="difficulty">
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                
+                <button id="new-game" class="btn">New Game</button>
+            </div>
         </div>
         
-        <div class="controls">
-            <button id="start-btn">Start Game</button>
-            <select id="difficulty">
-                <option value="1">Easy</option>
-                <option value="2">Medium</option>
-                <option value="3">Hard</option>
-                <option value="4">Expert</option>
-            </select>
-        </div>
+        <footer>
+            <p>Find the cup with the coin! 🪙</p>
+        </footer>
     </div>
-
-    <!-- Game modules -->
+    
+    <!-- Game Configuration -->
     <script src="src/js/config-phaser.js"></script>
+    
+    <!-- Game Components -->
     <script src="src/js/cup-phaser.js"></script>
+    
+    <!-- Main Game Logic -->
     <script src="src/js/game-phaser.js"></script>
+    
+    <!-- Initialize Game -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the game
+            window.game = new CupsAndCoinsGame();
+        });
+    </script>
 </body>
 </html> 
