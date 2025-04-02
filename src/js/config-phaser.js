@@ -8,7 +8,8 @@ const CONFIG = {
         width: 450,  // Increased to match container width
         height: 400, // Increased for more game space
         backgroundColor: 0xF1E7E7, // Updated to new color scheme
-        parent: 'phaser-game'
+        parent: 'phaser-game',
+        ROUNDS_PER_GAME: 5 // Number of rounds in a single game
     },
     
     // Scoring
@@ -34,33 +35,26 @@ const CONFIG = {
     
     // Difficulty levels - makes sure all cups are visible in each mode
     DIFFICULTY: {
-        1: { // Easy
-            NUM_CUPS: 3,
+        "easy": { // Easy
+            CUP_COUNT: 3,
             SHUFFLE_SPEED: 500, // Faster than before (was 650)
-            NUM_SHUFFLES: 5,
+            SHUFFLE_COUNT: 5,
             CUP_SCALE: 0.9,
             CUP_SPACING: 130 // Increased for better visibility
         },
-        2: { // Medium
-            NUM_CUPS: 4,
+        "medium": { // Medium
+            CUP_COUNT: 4,
             SHUFFLE_SPEED: 450, // Faster than before (was 550)
-            NUM_SHUFFLES: 8,
+            SHUFFLE_COUNT: 8,
             CUP_SCALE: 0.85, // Slightly larger than before
             CUP_SPACING: 110 // Increased for better visibility
         },
-        3: { // Hard
-            NUM_CUPS: 5,
+        "hard": { // Hard
+            CUP_COUNT: 5,
             SHUFFLE_SPEED: 400, // Faster than before (was 450)
-            NUM_SHUFFLES: 12,
+            SHUFFLE_COUNT: 12,
             CUP_SCALE: 0.75, // Slightly larger than before
             CUP_SPACING: 95 // Increased for better visibility
-        },
-        4: { // Expert
-            NUM_CUPS: 6,
-            SHUFFLE_SPEED: 330, // Faster than before (was 350)
-            NUM_SHUFFLES: 15,
-            CUP_SCALE: 0.65, // Slightly larger than before
-            CUP_SPACING: 75 // Increased for better visibility
         }
     },
     

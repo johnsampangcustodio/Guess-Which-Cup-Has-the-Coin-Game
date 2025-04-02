@@ -11,6 +11,7 @@ class CupsAndCoinsGame {
         this.isGameOver = false;
         this.currentRound = 0;
         this.roundsPerGame = CONFIG.GAME.ROUNDS_PER_GAME;
+        this.bgMusic = null;
         
         // Configure Phaser game
         this.initPhaser();
@@ -34,6 +35,9 @@ class CupsAndCoinsGame {
                 preload: this.preload.bind(this),
                 create: this.create.bind(this),
                 update: this.update.bind(this)
+            },
+            audio: {
+                disableWebAudio: false
             }
         };
         
@@ -56,6 +60,8 @@ class CupsAndCoinsGame {
         // Listen for new game button
         document.getElementById('new-game').addEventListener('click', () => {
             this.startNewGame();
+            // Play background music when starting a new game
+            this.playBackgroundMusic();
         });
     }
     
@@ -68,7 +74,8 @@ class CupsAndCoinsGame {
         // Load fonts
         this.scene.load.script('webfont', 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js');
         
-        // Preload any other assets here if needed
+        // Load background music
+        this.scene.load.audio('bgMusic', 'src/media/background-music.mp3');
     }
     
     /**
@@ -84,6 +91,31 @@ class CupsAndCoinsGame {
                 this.setupGame();
             }
         });
+        
+        // Create background music
+        this.bgMusic = this.scene.sound.add('bgMusic', {
+            volume: 0.5,
+            loop: true
+        });
+    }
+    
+    /**
+     * Play background music with fade-in effect
+     */
+    playBackgroundMusic() {
+        if (this.bgMusic && !this.bgMusic.isPlaying) {
+            // Start at lower volume and fade in
+            this.bgMusic.setVolume(0.2);
+            this.bgMusic.play();
+            
+            // Fade in to normal volume
+            this.scene.tweens.add({
+                targets: this.bgMusic,
+                volume: 0.5,
+                duration: 1500,
+                ease: 'Linear'
+            });
+        }
     }
     
     /**
@@ -429,6 +461,19 @@ class CupsAndCoinsGame {
         
         // Lift all cups to reveal the one with coin
         this.cups.forEach(cup => cup.lift());
+        
+        // Fade out music
+        if (this.bgMusic && this.bgMusic.isPlaying) {
+            this.scene.tweens.add({
+                targets: this.bgMusic,
+                volume: 0,
+                duration: 2000,
+                ease: 'Linear',
+                onComplete: () => {
+                    this.bgMusic.stop();
+                }
+            });
+        }
     }
     
     /**
