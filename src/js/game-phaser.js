@@ -127,14 +127,21 @@ class CupsAndCoinsGame {
         loadingOverlay.appendChild(loadingStatus);
         loadingOverlay.appendChild(dotsContainer);
         
-        // Add overlay to game container 
-        setTimeout(() => {
-            const gameContainer = document.getElementById('phaser-game');
-            if (gameContainer) {
-                gameContainer.style.position = 'relative';
-                gameContainer.appendChild(loadingOverlay);
-            }
-        }, 100);
+        // Add overlay to game container immediately
+        const gameContainer = document.getElementById('phaser-game');
+        if (gameContainer) {
+            gameContainer.style.position = 'relative';
+            gameContainer.appendChild(loadingOverlay);
+        } else {
+            // If game container isn't ready yet, try once more after a short delay
+            setTimeout(() => {
+                const container = document.getElementById('phaser-game');
+                if (container) {
+                    container.style.position = 'relative';
+                    container.appendChild(loadingOverlay);
+                }
+            }, 50);
+        }
         
         // Store references
         this.loadingOverlay = loadingOverlay;
@@ -169,7 +176,7 @@ class CupsAndCoinsGame {
                 if (this.loadingOverlay && this.loadingOverlay.parentNode) {
                     this.loadingOverlay.parentNode.removeChild(this.loadingOverlay);
                 }
-            }, 500);
+            }, 300); // Reduced from 500ms
         }
     }
     
@@ -190,7 +197,13 @@ class CupsAndCoinsGame {
                 update: this.update.bind(this)
             },
             audio: {
-                disableWebAudio: false
+                disableWebAudio: false,
+                noAudio: false
+            },
+            render: {
+                pixelArt: false,
+                antialias: true,
+                roundPixels: false
             }
         };
         
@@ -212,13 +225,12 @@ class CupsAndCoinsGame {
         
         // Listen for new game button
         document.getElementById('new-game').addEventListener('click', () => {
-            if (this.assetsLoaded) {
-                this.startNewGame();
-                // Play background music when starting a new game
+            // Always allow starting the game, even if assets aren't fully loaded
+            this.startNewGame();
+            
+            // Try to play music if it's loaded
+            if (this.bgMusic) {
                 this.playBackgroundMusic();
-            } else {
-                console.error("Game assets not fully loaded yet");
-                alert("Please wait, game is still loading...");
             }
         });
     }
@@ -229,32 +241,26 @@ class CupsAndCoinsGame {
     preload() {
         this.scene = this.gamePhaser.scene.scenes[0];
         
-        // Show loading progress
-        this.updateLoadingProgress(10, "Loading game framework...");
+        // Update loading progress
+        this.updateLoadingProgress(20, "Loading game assets...");
         
-        // Track loading progress
-        this.scene.load.on('progress', (value) => {
-            // Update loading progress (scale to 10-80%)
-            this.updateLoadingProgress(10 + (value * 70), "Loading game assets...");
-        });
-        
-        // Load fonts
-        this.updateLoadingProgress(20, "Loading fonts...");
-        this.scene.load.script('webfont', 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js');
-        
-        // Load background music
-        this.updateLoadingProgress(40, "Loading music...");
+        // Fast-track loading by not waiting for music
         this.scene.load.audio('bgMusic', 'src/media/bgMusic.mp3');
         
-        // Show loading text in the game area (as backup)
-        const width = this.gameConfig.width;
-        const height = this.gameConfig.height;
+        // Mark music loading as optional - don't block game start
+        this.scene.load.once('filecomplete-audio-bgMusic', () => {
+            console.log("Music loaded successfully");
+        });
         
-        this.loadingText = this.scene.add.text(width/2, height/2, 'Loading...', {
-            fontFamily: 'Arial',
-            fontSize: '18px',
-            color: '#825765'
-        }).setOrigin(0.5);
+        // Continue even if music fails to load
+        this.scene.load.once('loaderror', (fileObj) => {
+            console.warn("Asset failed to load:", fileObj.key);
+            // Continue with game setup anyway
+            this.updateLoadingProgress(80, "Setting up game...");
+        });
+        
+        // Speed up by not waiting for all assets
+        this.updateLoadingProgress(50, "Preparing game...");
     }
     
     /**
@@ -264,46 +270,40 @@ class CupsAndCoinsGame {
         console.log("Game scene created");
         this.updateLoadingProgress(80, "Setting up game...");
         
-        // Ensure fonts are loaded
+        // Set up game immediately without waiting for fonts
+        this.setupGame();
+        
+        // Load fonts in background
         WebFont.load({
             google: {
                 families: ['Baloo 2:400,600,700']
             },
             active: () => {
-                // Remove loading text
-                if (this.loadingText) {
-                    this.loadingText.destroy();
-                }
-                
-                this.updateLoadingProgress(90, "Preparing game elements...");
-                this.setupGame();
+                console.log("Fonts loaded");
+            },
+            inactive: () => {
+                console.warn("Fonts failed to load");
             }
         });
         
         try {
-            // Create background music
+            // Create background music if possible
             this.bgMusic = this.scene.sound.add('bgMusic', {
                 volume: 0.5,
                 loop: true
             });
-            console.log("Background music loaded successfully");
-            
-            this.updateLoadingProgress(95, "Ready to play!");
-            this.assetsLoaded = true;
-            
-            // Hide loading overlay after a short delay
-            setTimeout(() => {
-                this.hideLoadingOverlay();
-            }, 1000);
         } catch (error) {
-            console.error("Error loading background music:", error);
-            this.updateLoadingProgress(95, "Error loading audio. Game is ready.");
-            
-            // Still hide loading overlay
-            setTimeout(() => {
-                this.hideLoadingOverlay();
-            }, 1000);
+            console.warn("Background music not available:", error);
         }
+        
+        // Mark game as loaded
+        this.assetsLoaded = true;
+        this.updateLoadingProgress(100, "Game Ready!");
+        
+        // Hide loading overlay after a very short delay
+        setTimeout(() => {
+            this.hideLoadingOverlay();
+        }, 200); // Reduced from 1000ms
     }
     
     /**
@@ -312,23 +312,12 @@ class CupsAndCoinsGame {
     playBackgroundMusic() {
         try {
             if (this.bgMusic && !this.bgMusic.isPlaying) {
-                console.log("Attempting to play background music");
-                // Start at lower volume and fade in
-                this.bgMusic.setVolume(0.2);
+                console.log("Playing background music");
+                this.bgMusic.setVolume(0.5);
                 this.bgMusic.play();
-                
-                // Fade in to normal volume
-                this.scene.tweens.add({
-                    targets: this.bgMusic,
-                    volume: 0.5,
-                    duration: 1500,
-                    ease: 'Linear'
-                });
-            } else {
-                console.log("Background music already playing or not available");
             }
         } catch (error) {
-            console.error("Error playing background music:", error);
+            console.warn("Error playing music:", error);
         }
     }
     
@@ -357,24 +346,29 @@ class CupsAndCoinsGame {
      */
     setupGame() {
         console.log("Setting up game elements");
-        // Create UI elements
-        this.createUI();
         
-        // Create cups
-        this.createCups();
-        
-        // Show welcome message
-        this.updateMessageText('Welcome to CUPS AND COINS!', 0xE69DB8);
-        
-        // Set initial state
-        this.isGameStarted = false;
-        this.isShuffling = false;
-        this.isGameOver = false;
-        
-        // Only show preview on initial load
-        if (this.isInitialPreview) {
-            this.showCoinBriefly();
-            this.isInitialPreview = false;
+        try {
+            // Create UI elements
+            this.createUI();
+            
+            // Create cups
+            this.createCups();
+            
+            // Show welcome message
+            this.updateMessageText('Welcome to CUPS AND COINS!', 0xE69DB8);
+            
+            // Set initial state
+            this.isGameStarted = false;
+            this.isShuffling = false;
+            this.isGameOver = false;
+            
+            // Show preview if cups loaded successfully
+            if (this.cups && this.cups.length > 0) {
+                this.showCoinBriefly();
+            }
+        } catch (error) {
+            console.error("Error setting up game:", error);
+            this.updateLoadingProgress(100, "Error loading game. Try refreshing.");
         }
     }
     
@@ -383,26 +377,24 @@ class CupsAndCoinsGame {
      */
     showCoinBriefly() {
         console.log("Showing coin preview");
-        // Schedule after a short delay
-        this.scene.time.delayedCall(500, () => {
+        
+        // Find cup with coin
+        const coinCup = this.cups.find(cup => cup.hasCoin);
+        
+        if (coinCup) {
             // Show message
             this.updateMessageText('Watch for the coin!', 0xE69DB8);
             
-            // Get cup with coin
-            const coinCup = this.cups.find(cup => cup.hasCoin);
+            // Lift to show coin
+            coinCup.lift();
             
-            if (coinCup) {
-                // Lift to show coin
-                coinCup.lift();
-                
-                // Lower after a moment
-                this.scene.time.delayedCall(CONFIG.ANIMATION.SHOW_COIN_TIME, () => {
-                    coinCup.lower();
-                });
-            } else {
-                console.error("No coin cup found during preview");
-            }
-        });
+            // Lower after a moment
+            this.scene.time.delayedCall(CONFIG.ANIMATION.SHOW_COIN_TIME, () => {
+                coinCup.lower();
+            });
+        } else {
+            console.error("No coin cup found during preview");
+        }
     }
     
     /**
