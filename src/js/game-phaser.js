@@ -75,7 +75,7 @@ class CupsAndCoinsGame {
         this.scene.load.script('webfont', 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js');
         
         // Load background music
-        this.scene.load.audio('bgMusic', 'src/media/background-music.mp3');
+        this.scene.load.audio('bgMusic', 'src/media/bgMusic.mp3');
     }
     
     /**
