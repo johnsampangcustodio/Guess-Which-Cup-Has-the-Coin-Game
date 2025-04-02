@@ -12,6 +12,11 @@ class CupsAndCoinsGame {
         this.currentRound = 0;
         this.roundsPerGame = CONFIG.GAME.ROUNDS_PER_GAME;
         this.bgMusic = null;
+        this.isInitialPreview = true;
+        this.assetsLoaded = false;
+        
+        // Create loading overlay
+        this.createLoadingOverlay();
         
         // Configure Phaser game
         this.initPhaser();
@@ -21,14 +26,162 @@ class CupsAndCoinsGame {
     }
     
     /**
+     * Create a loading overlay that sits on top of the game
+     */
+    createLoadingOverlay() {
+        // Create loading overlay container
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.id = 'loading-overlay';
+        loadingOverlay.style.position = 'absolute';
+        loadingOverlay.style.top = '0';
+        loadingOverlay.style.left = '0';
+        loadingOverlay.style.width = '100%';
+        loadingOverlay.style.height = '100%';
+        loadingOverlay.style.backgroundColor = '#F1E7E7';
+        loadingOverlay.style.display = 'flex';
+        loadingOverlay.style.flexDirection = 'column';
+        loadingOverlay.style.justifyContent = 'center';
+        loadingOverlay.style.alignItems = 'center';
+        loadingOverlay.style.zIndex = '100';
+        loadingOverlay.style.borderRadius = '15px';
+        
+        // Loading title
+        const loadingTitle = document.createElement('h2');
+        loadingTitle.textContent = 'LOADING GAME';
+        loadingTitle.style.color = '#E69DB8';
+        loadingTitle.style.fontFamily = '"Baloo 2", cursive';
+        loadingTitle.style.marginBottom = '20px';
+        
+        // Add spinner animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+            
+            .loading-item {
+                animation: bounce 1.2s ease infinite;
+                margin: 0 5px;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background-color: #E69DB8;
+                display: inline-block;
+            }
+            
+            .loading-item:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+            
+            .loading-item:nth-child(3) {
+                animation-delay: 0.4s;
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Loading progress
+        const progressContainer = document.createElement('div');
+        progressContainer.style.width = '200px';
+        progressContainer.style.height = '30px';
+        progressContainer.style.backgroundColor = '#FFD0C7';
+        progressContainer.style.borderRadius = '15px';
+        progressContainer.style.margin = '20px 0';
+        progressContainer.style.overflow = 'hidden';
+        
+        const progressBar = document.createElement('div');
+        progressBar.id = 'loading-progress-bar';
+        progressBar.style.width = '0%';
+        progressBar.style.height = '100%';
+        progressBar.style.backgroundColor = '#E69DB8';
+        progressBar.style.transition = 'width 0.3s ease';
+        
+        // Loading status text
+        const loadingStatus = document.createElement('div');
+        loadingStatus.id = 'loading-status';
+        loadingStatus.textContent = 'Preparing cups and coins...';
+        loadingStatus.style.color = '#825765';
+        loadingStatus.style.fontFamily = '"Baloo 2", cursive';
+        loadingStatus.style.fontSize = '14px';
+        loadingStatus.style.marginTop = '10px';
+        
+        // Bouncing dots
+        const dotsContainer = document.createElement('div');
+        dotsContainer.style.marginTop = '15px';
+        
+        for (let i = 0; i < 3; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'loading-item';
+            dotsContainer.appendChild(dot);
+        }
+        
+        // Add elements to overlay
+        progressContainer.appendChild(progressBar);
+        loadingOverlay.appendChild(loadingTitle);
+        loadingOverlay.appendChild(progressContainer);
+        loadingOverlay.appendChild(loadingStatus);
+        loadingOverlay.appendChild(dotsContainer);
+        
+        // Add overlay to game container 
+        setTimeout(() => {
+            const gameContainer = document.getElementById('phaser-game');
+            if (gameContainer) {
+                gameContainer.style.position = 'relative';
+                gameContainer.appendChild(loadingOverlay);
+            }
+        }, 100);
+        
+        // Store references
+        this.loadingOverlay = loadingOverlay;
+        this.progressBar = progressBar;
+        this.loadingStatus = loadingStatus;
+    }
+    
+    /**
+     * Update loading progress
+     */
+    updateLoadingProgress(percent, status) {
+        if (this.progressBar) {
+            this.progressBar.style.width = `${percent}%`;
+        }
+        
+        if (this.loadingStatus && status) {
+            this.loadingStatus.textContent = status;
+        }
+    }
+    
+    /**
+     * Hide loading overlay when game is ready
+     */
+    hideLoadingOverlay() {
+        if (this.loadingOverlay) {
+            // Fade out animation
+            this.loadingOverlay.style.transition = 'opacity 0.5s ease';
+            this.loadingOverlay.style.opacity = '0';
+            
+            // Remove after animation
+            setTimeout(() => {
+                if (this.loadingOverlay && this.loadingOverlay.parentNode) {
+                    this.loadingOverlay.parentNode.removeChild(this.loadingOverlay);
+                }
+            }, 500);
+        }
+    }
+    
+    /**
      * Initialize Phaser game instance
      */
     initPhaser() {
         // Create Phaser game
         this.gameConfig = {
             type: Phaser.AUTO,
-            width: CONFIG.GAME.WIDTH,
-            height: CONFIG.GAME.HEIGHT,
+            width: CONFIG.GAME.width,
+            height: CONFIG.GAME.height,
             backgroundColor: CONFIG.COLORS.TABLE,
             parent: 'phaser-game',
             scene: {
@@ -51,17 +204,22 @@ class CupsAndCoinsGame {
         // Listen for difficulty change
         document.getElementById('difficulty').addEventListener('change', (e) => {
             this.currentDifficulty = e.target.value;
-            // Reset cups on difficulty change
-            if (this.scene) {
+            // Reset cups on difficulty change if game already started
+            if (this.scene && this.isGameStarted) {
                 this.resetCups();
             }
         });
         
         // Listen for new game button
         document.getElementById('new-game').addEventListener('click', () => {
-            this.startNewGame();
-            // Play background music when starting a new game
-            this.playBackgroundMusic();
+            if (this.assetsLoaded) {
+                this.startNewGame();
+                // Play background music when starting a new game
+                this.playBackgroundMusic();
+            } else {
+                console.error("Game assets not fully loaded yet");
+                alert("Please wait, game is still loading...");
+            }
         });
     }
     
@@ -71,50 +229,106 @@ class CupsAndCoinsGame {
     preload() {
         this.scene = this.gamePhaser.scene.scenes[0];
         
+        // Show loading progress
+        this.updateLoadingProgress(10, "Loading game framework...");
+        
+        // Track loading progress
+        this.scene.load.on('progress', (value) => {
+            // Update loading progress (scale to 10-80%)
+            this.updateLoadingProgress(10 + (value * 70), "Loading game assets...");
+        });
+        
         // Load fonts
+        this.updateLoadingProgress(20, "Loading fonts...");
         this.scene.load.script('webfont', 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js');
         
         // Load background music
+        this.updateLoadingProgress(40, "Loading music...");
         this.scene.load.audio('bgMusic', 'src/media/bgMusic.mp3');
+        
+        // Show loading text in the game area (as backup)
+        const width = this.gameConfig.width;
+        const height = this.gameConfig.height;
+        
+        this.loadingText = this.scene.add.text(width/2, height/2, 'Loading...', {
+            fontFamily: 'Arial',
+            fontSize: '18px',
+            color: '#825765'
+        }).setOrigin(0.5);
     }
     
     /**
      * Create game objects
      */
     create() {
+        console.log("Game scene created");
+        this.updateLoadingProgress(80, "Setting up game...");
+        
         // Ensure fonts are loaded
         WebFont.load({
             google: {
                 families: ['Baloo 2:400,600,700']
             },
             active: () => {
+                // Remove loading text
+                if (this.loadingText) {
+                    this.loadingText.destroy();
+                }
+                
+                this.updateLoadingProgress(90, "Preparing game elements...");
                 this.setupGame();
             }
         });
         
-        // Create background music
-        this.bgMusic = this.scene.sound.add('bgMusic', {
-            volume: 0.5,
-            loop: true
-        });
+        try {
+            // Create background music
+            this.bgMusic = this.scene.sound.add('bgMusic', {
+                volume: 0.5,
+                loop: true
+            });
+            console.log("Background music loaded successfully");
+            
+            this.updateLoadingProgress(95, "Ready to play!");
+            this.assetsLoaded = true;
+            
+            // Hide loading overlay after a short delay
+            setTimeout(() => {
+                this.hideLoadingOverlay();
+            }, 1000);
+        } catch (error) {
+            console.error("Error loading background music:", error);
+            this.updateLoadingProgress(95, "Error loading audio. Game is ready.");
+            
+            // Still hide loading overlay
+            setTimeout(() => {
+                this.hideLoadingOverlay();
+            }, 1000);
+        }
     }
     
     /**
      * Play background music with fade-in effect
      */
     playBackgroundMusic() {
-        if (this.bgMusic && !this.bgMusic.isPlaying) {
-            // Start at lower volume and fade in
-            this.bgMusic.setVolume(0.2);
-            this.bgMusic.play();
-            
-            // Fade in to normal volume
-            this.scene.tweens.add({
-                targets: this.bgMusic,
-                volume: 0.5,
-                duration: 1500,
-                ease: 'Linear'
-            });
+        try {
+            if (this.bgMusic && !this.bgMusic.isPlaying) {
+                console.log("Attempting to play background music");
+                // Start at lower volume and fade in
+                this.bgMusic.setVolume(0.2);
+                this.bgMusic.play();
+                
+                // Fade in to normal volume
+                this.scene.tweens.add({
+                    targets: this.bgMusic,
+                    volume: 0.5,
+                    duration: 1500,
+                    ease: 'Linear'
+                });
+            } else {
+                console.log("Background music already playing or not available");
+            }
+        } catch (error) {
+            console.error("Error playing background music:", error);
         }
     }
     
@@ -142,6 +356,7 @@ class CupsAndCoinsGame {
      * Set up the main game elements
      */
     setupGame() {
+        console.log("Setting up game elements");
         // Create UI elements
         this.createUI();
         
@@ -156,13 +371,18 @@ class CupsAndCoinsGame {
         this.isShuffling = false;
         this.isGameOver = false;
         
-        this.showCoinBriefly();
+        // Only show preview on initial load
+        if (this.isInitialPreview) {
+            this.showCoinBriefly();
+            this.isInitialPreview = false;
+        }
     }
     
     /**
      * Show coin briefly as a preview
      */
     showCoinBriefly() {
+        console.log("Showing coin preview");
         // Schedule after a short delay
         this.scene.time.delayedCall(500, () => {
             // Show message
@@ -171,18 +391,17 @@ class CupsAndCoinsGame {
             // Get cup with coin
             const coinCup = this.cups.find(cup => cup.hasCoin);
             
-            // Lift to show coin
-            coinCup.lift();
-            
-            // Lower after a moment
-            this.scene.time.delayedCall(CONFIG.ANIMATION.SHOW_COIN_TIME, () => {
-                coinCup.lower();
+            if (coinCup) {
+                // Lift to show coin
+                coinCup.lift();
                 
-                // Start first round after showing
-                this.scene.time.delayedCall(500, () => {
-                    this.startNewGame();
+                // Lower after a moment
+                this.scene.time.delayedCall(CONFIG.ANIMATION.SHOW_COIN_TIME, () => {
+                    coinCup.lower();
                 });
-            });
+            } else {
+                console.error("No coin cup found during preview");
+            }
         });
     }
     
@@ -217,6 +436,7 @@ class CupsAndCoinsGame {
      * Create cups based on difficulty
      */
     createCups() {
+        console.log("Creating cups for difficulty:", this.currentDifficulty);
         const width = this.gameConfig.width;
         const height = this.gameConfig.height;
         
@@ -226,8 +446,14 @@ class CupsAndCoinsGame {
         }
         
         // Create cups
-        const cupCount = CONFIG.DIFFICULTY[this.currentDifficulty].CUP_COUNT;
-        const cupSpacing = CONFIG.DIFFICULTY[this.currentDifficulty].CUP_SPACING;
+        const diffSettings = CONFIG.DIFFICULTY[this.currentDifficulty];
+        if (!diffSettings) {
+            console.error("Invalid difficulty settings:", this.currentDifficulty);
+            return;
+        }
+        
+        const cupCount = diffSettings.CUP_COUNT;
+        const cupSpacing = diffSettings.CUP_SPACING;
         
         this.cups = [];
         
@@ -262,15 +488,13 @@ class CupsAndCoinsGame {
     resetCups() {
         // Create new cups
         this.createCups();
-        
-        // Show coin briefly
-        this.showCoinBriefly();
     }
     
     /**
      * Start a new game
      */
     startNewGame() {
+        console.log("Starting new game");
         // Reset game state
         this.isGameStarted = true;
         this.isGameOver = false;
@@ -290,6 +514,7 @@ class CupsAndCoinsGame {
      * Start a new round
      */
     startNewRound() {
+        console.log("Starting round:", this.currentRound + 1);
         // Increment round
         this.currentRound++;
         this.updateRoundsText();
@@ -308,6 +533,11 @@ class CupsAndCoinsGame {
         
         // Get cup with coin
         const coinCup = this.cups.find(cup => cup.hasCoin);
+        
+        if (!coinCup) {
+            console.error("No coin cup found in round", this.currentRound);
+            return;
+        }
         
         // Lift to show coin
         coinCup.lift();
