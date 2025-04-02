@@ -79,9 +79,11 @@ const CONFIG = {
     CUP: {
         WIDTH: 70,           // Cup width
         HEIGHT: 90,          // Cup height
-        BOTTOM_WIDTH: 50,    // Width of cup bottom
-        COLOR: '#4285F4',    // Cup color - Google Blue
-        SHADOW: 'rgba(0,0,0,0.4)', // Cup shadow color
+        BOTTOM_WIDTH: 60,    // Width of cup bottom
+        COLOR: '#421C14',    // Dark brown color
+        SHADOW: 'rgba(0,0,0,0.3)', // Shadows
+        CAT_COLOR: '#F8AD6B', // Cat color (orange/peach)
+        CAT_STRIPE_COLOR: '#E3883B', // Darker orange for cat stripes
         // 3D properties kept for compatibility
         RADIUS_TOP: 0.5,    
         RADIUS_BOTTOM: 0.35,
@@ -90,11 +92,20 @@ const CONFIG = {
         LIFT_HEIGHT: 1.5,
     },
     
-    // Coin dimensions and appearance
+    // Gem dimensions and appearance
     COIN: {
-        RADIUS: 25,          // Increased coin radius for better visibility
-        COLOR: '#FFC107',    // Brighter gold color
-        SHADOW: 'rgba(0,0,0,0.5)', // Darker shadow for better contrast
+        RADIUS: 22,          // Gem size
+        COLOR: '#2E86C1',    // Base gem color (blue)
+        SHADOW: 'rgba(0,0,0,0.3)', // Shadow
+        FACETS: 6,           // Number of facets
+        SPARKLE: true,       // Enable sparkle effect
+        COLORS: [            // Multiple colors for gem facets
+            '#2E86C1',       // Blue
+            '#3498DB',       // Lighter blue
+            '#1A5276',       // Darker blue
+            '#AED6F1',       // Very light blue
+            '#2874A6'        // Medium blue
+        ]
     },
     
     // Physics and Movement

@@ -107,12 +107,12 @@ class Game {
         if (correct) {
             this.score += CONFIG.POINTS_PER_WIN;
             this.updateScoreDisplay();
-            this.showMessage('Correct! +' + CONFIG.POINTS_PER_WIN + ' points', '#28a745');
+            this.showMessage('YOU FOUND THE GEM! +' + CONFIG.POINTS_PER_WIN + ' POINTS', '#2E86C1');
             
             // Add a visual celebration effect
             this.showCelebration();
         } else {
-            this.showMessage('Wrong! The coin was under cup ' + (this.coinIndex + 1), '#dc3545');
+            this.showMessage('THE GEM WAS HIDING HERE', '#421C14');
             
             // Reveal the correct cup
             this.cups[this.coinIndex].reveal();
@@ -120,7 +120,7 @@ class Game {
         
         // Allow restart after a short delay
         setTimeout(() => {
-            document.getElementById('start-btn').textContent = 'Play Again';
+            document.getElementById('start-btn').textContent = 'PLAY AGAIN';
             document.getElementById('start-btn').disabled = false;
             this.gameActive = false;
         }, 2000);
@@ -138,14 +138,14 @@ class Game {
             this.gameActive = true;
             this.canSelect = false;
             document.getElementById('start-btn').disabled = true;
-            document.getElementById('start-btn').textContent = 'Playing...';
+            document.getElementById('start-btn').textContent = 'PLAYING...';
             
             // Hide any existing selection buttons
             this.hideSelectionButtons();
             
             // Get difficulty level
             this.difficulty = parseInt(document.getElementById('difficulty').value);
-            document.getElementById('level').textContent = `Level: ${this.difficulty}`;
+            document.getElementById('level').textContent = `LEVEL: ${this.difficulty}`;
             
             // Create cups based on difficulty
             const numCups = CONFIG.DIFFICULTY[this.difficulty].NUM_CUPS;
@@ -163,7 +163,7 @@ class Game {
             // Force a render to make sure cups and coin are drawn
             this.render();
             
-            this.showMessage('Remember which cup has the coin!', '#007bff');
+            this.showMessage('REMEMBER THE GEM LOCATION', '#421C14');
             
             // Wait for player to see the coin
             setTimeout(() => {
@@ -189,7 +189,7 @@ class Game {
     }
     
     /**
-     * Simple cup shuffling
+     * Simple cup shuffling with smooth movements
      */
     simpleShuffle() {
         const canvasWidth = this.canvas.width;
@@ -198,7 +198,7 @@ class Game {
         const cupWidth = CONFIG.CUP.WIDTH;
         
         // Show shuffling message
-        this.showMessage('Cups are shuffling!', '#ff9900');
+        this.showMessage('WATCH THE CUPS SHUFFLE', '#421C14');
         
         // Add a visual shuffle indicator
         this.showShuffleIndicator();
@@ -209,54 +209,90 @@ class Game {
             this.render();
         }
         
-        // Make very dramatic movements - more exaggerated positions
-        // First, create an array of position patterns
+        // Create movement patterns
         const patterns = [
-            // Circle pattern
+            // Circle dance pattern
             (j, cupCount) => {
                 const angle = (j * (2 * Math.PI / cupCount));
-                const radius = canvasWidth * 0.35; // Larger radius
+                const radius = canvasWidth * 0.3;
                 return {
                     x: canvasWidth / 2 + Math.cos(angle) * radius,
                     y: canvasHeight / 2 + Math.sin(angle) * radius
                 };
             },
-            // Diagonal line
+            // Flower pattern - cups move in a flower shape
             (j, cupCount) => {
-                const spacing = Math.min(canvasWidth, canvasHeight) * 0.8 / (cupCount + 1);
+                const angle = (j * (2 * Math.PI / cupCount));
+                const radius = canvasWidth * 0.25;
+                // Flower pattern using sin to create "petals"
+                const petalFactor = 0.3;
                 return {
-                    x: canvasWidth * 0.15 + j * spacing,
-                    y: canvasHeight * 0.15 + j * spacing
+                    x: canvasWidth / 2 + Math.cos(angle) * (radius + Math.sin(angle * 5) * radius * petalFactor),
+                    y: canvasHeight / 2 + Math.sin(angle) * (radius + Math.sin(angle * 5) * radius * petalFactor)
                 };
             },
-            // Horizontal line with waves
+            // Wave pattern - cups move in a gentle wave
             (j, cupCount) => {
                 const spacing = canvasWidth * 0.7 / (cupCount + 1);
                 return {
                     x: canvasWidth * 0.15 + j * spacing,
-                    y: canvasHeight * 0.5 + Math.sin(j * Math.PI) * 80 // More vertical movement
+                    y: canvasHeight * 0.5 + Math.sin(j * Math.PI) * 40
                 };
             },
-            // Scattered positions
+            // Carousel pattern - cups move in a carousel-like circle
             (j, cupCount) => {
+                const angle = (j * (2 * Math.PI / cupCount));
+                const radius = canvasWidth * 0.25;
                 return {
-                    x: padding + cupWidth + Math.random() * (canvasWidth - cupWidth - padding * 3),
-                    y: padding + cupWidth + Math.random() * (canvasHeight * 0.7 - padding * 2)
+                    x: canvasWidth / 2 + Math.cos(angle) * radius,
+                    y: canvasHeight / 2 + Math.sin(angle) * radius * 0.5 // Flatter circle
                 };
             }
         ];
         
-        // Determine number of steps based on difficulty
-        const numMoves = 12 + this.difficulty * 4; // More moves for more animation time
+        // Add some specific animations
+        const specialPatterns = [
+            // All cups gather in the center then spread out
+            (j, cupCount) => {
+                return {
+                    x: canvasWidth / 2,
+                    y: canvasHeight / 2
+                };
+            },
+            // Cups line up in a row
+            (j, cupCount) => {
+                const spacing = canvasWidth * 0.7 / (cupCount + 1);
+                return {
+                    x: canvasWidth * 0.15 + j * spacing,
+                    y: canvasHeight * 0.5
+                };
+            }
+        ];
         
         // Create a timeline of moves
         const timeline = [];
         
-        // Add dramatic shuffle movements
+        // Determine number of steps
+        const numMoves = 10 + this.difficulty * 2; 
+        
+        // Start with cups gathering in center
+        timeline.push(Array(this.cups.length).fill(0).map(() => ({
+            x: canvasWidth / 2,
+            y: canvasHeight / 2
+        })));
+        
+        // Then use the patterns for the main shuffle
         for (let i = 0; i < numMoves; i++) {
             // Select a pattern based on the current step
-            const patternIndex = i % patterns.length;
-            const pattern = patterns[patternIndex];
+            let pattern;
+            
+            if (i < 2) {
+                // Use special patterns at the beginning
+                pattern = specialPatterns[i % specialPatterns.length];
+            } else {
+                // Use regular patterns for the rest
+                pattern = patterns[i % patterns.length];
+            }
             
             // Generate positions for each cup
             const positions = [];
@@ -270,8 +306,8 @@ class Game {
                 positions.push({ x, y });
             }
             
-            // Randomize the cup positions to make it harder to track
-            if (i > 2) { // Skip first few moves to show clear initial movement
+            // Only shuffle positions occasionally and later in the animation
+            if (i > 5 && i % 3 === 0) {
                 // Shuffle the positions array
                 for (let j = positions.length - 1; j > 0; j--) {
                     const k = Math.floor(Math.random() * (j + 1));
@@ -294,7 +330,7 @@ class Game {
         timeline.push(finalPositions);
         
         // Move cups through each position in the timeline
-        const totalDuration = 3000; // 3 seconds total animation
+        const totalDuration = 4500; // 4.5 seconds
         const stepDuration = totalDuration / timeline.length;
         
         // Execute each move with a delay
@@ -305,9 +341,11 @@ class Game {
                     this.cups[j].moveTo(positions[j].x, positions[j].y);
                 }
                 
-                // Update message halfway through
-                if (i === Math.floor(timeline.length / 2)) {
-                    this.showMessage('Keep your eyes on the cups!', '#ff9900');
+                // Update message with prompts
+                if (i === Math.floor(timeline.length / 3)) {
+                    this.showMessage('KEEP TRACK OF THE CUPS', '#421C14');
+                } else if (i === Math.floor(timeline.length * 2 / 3)) {
+                    this.showMessage('ALMOST DONE SHUFFLING', '#421C14');
                 }
                 
                 // Update progress indicator
@@ -321,7 +359,7 @@ class Game {
                         setTimeout(() => {
                             this.createSelectionButtons();
                             this.canSelect = true;
-                            this.showMessage('Which cup has the coin?', '#007bff');
+                            this.showMessage('WHICH CUP HIDES THE GEM?', '#421C14');
                         }, 500);
                     }, stepDuration);
                 }
@@ -330,7 +368,7 @@ class Game {
     }
     
     /**
-     * Show shuffle progress indicator
+     * Show shuffle progress indicator with sleek styling
      */
     showShuffleIndicator() {
         // Remove existing indicator if it exists
@@ -347,21 +385,47 @@ class Game {
         indicator.style.left = '50%';
         indicator.style.transform = 'translateX(-50%)';
         indicator.style.width = '60%';
-        indicator.style.height = '10px';
-        indicator.style.backgroundColor = 'rgba(255,255,255,0.3)';
-        indicator.style.borderRadius = '5px';
+        indicator.style.height = '8px';
+        indicator.style.backgroundColor = 'rgba(255,255,255,0.5)';
+        indicator.style.borderRadius = '4px';
         indicator.style.zIndex = '50';
         indicator.style.overflow = 'hidden';
+        indicator.style.border = '1px solid rgba(66, 28, 20, 0.3)';
+        indicator.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
         
-        // Create progress bar
+        // Create progress bar with gradient
         const progress = document.createElement('div');
         progress.id = 'shuffle-progress';
         progress.style.width = '0%';
         progress.style.height = '100%';
-        progress.style.backgroundColor = '#ff9900';
-        progress.style.borderRadius = '5px';
+        progress.style.borderRadius = '3px';
         progress.style.transition = 'width 0.3s ease';
         
+        // Cat-themed gradient for progress bar
+        progress.style.background = 'linear-gradient(to right, #421C14, #F8AD6B)';
+        
+        // Add subtle animated shimmer to the progress bar
+        const shimmer = document.createElement('div');
+        shimmer.style.position = 'absolute';
+        shimmer.style.top = '0';
+        shimmer.style.right = '0';
+        shimmer.style.width = '100%';
+        shimmer.style.height = '100%';
+        shimmer.style.background = 'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%)';
+        shimmer.style.backgroundSize = '200% 100%';
+        shimmer.style.animation = 'shimmerMove 2s linear infinite';
+        
+        // Add the animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shimmerMove {
+                0% { background-position: 100% 0; }
+                100% { background-position: -100% 0; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        progress.appendChild(shimmer);
         indicator.appendChild(progress);
         gameArea.appendChild(indicator);
     }
@@ -531,7 +595,7 @@ class Game {
             
             // Create button element
             const button = document.createElement('button');
-            button.textContent = `Cup ${i+1}`;
+            button.textContent = `CUP ${i+1}`;
             button.style.position = 'absolute';
             
             // Position button below the cup
@@ -542,23 +606,28 @@ class Game {
             
             // Style the button
             button.style.padding = '8px 12px';
-            button.style.backgroundColor = '#4CAF50';
+            button.style.backgroundColor = '#421C14';
             button.style.color = 'white';
             button.style.border = 'none';
-            button.style.borderRadius = '4px';
+            button.style.borderRadius = '6px';
             button.style.cursor = 'pointer';
             button.style.zIndex = '1000';
-            button.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+            button.style.boxShadow = '0 3px 0 #2C1208';
             button.style.transition = 'all 0.2s ease';
+            button.style.fontFamily = "'Fredoka', sans-serif";
+            button.style.fontWeight = '600';
+            button.style.letterSpacing = '1px';
             
             // Add hover effects
             button.onmouseover = function() {
-                this.style.backgroundColor = '#45a049';
-                this.style.transform = 'scale(1.05)';
+                this.style.backgroundColor = '#5A2C18';
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 5px 0 #2C1208';
             };
             button.onmouseout = function() {
-                this.style.backgroundColor = '#4CAF50';
+                this.style.backgroundColor = '#421C14';
                 this.style.transform = 'scale(1)';
+                this.style.boxShadow = '0 3px 0 #2C1208';
             };
             
             // Add click event
@@ -661,7 +730,7 @@ class Game {
      * Get random bright color for particles
      */
     getRandomColor() {
-        const colors = ['#FF5252', '#FF4081', '#E040FB', '#7C4DFF', '#536DFE', '#448AFF', '#40C4FF', '#18FFFF', '#64FFDA', '#69F0AE', '#B2FF59', '#EEFF41', '#FFFF00', '#FFD740', '#FFAB40', '#FF6E40'];
+        const colors = ['#FFB6C1', '#FFFECE', '#F1E7E7', '#FFD0C7', '#E69DB8', '#FFC8DD', '#FFAFCC', '#BDE0FE', '#A2D2FF', '#CDB4DB', '#FFC6FF', '#CAFFBF', '#9BF6FF'];
         return colors[Math.floor(Math.random() * colors.length)];
     }
     
