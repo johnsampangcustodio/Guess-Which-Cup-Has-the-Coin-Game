@@ -8,9 +8,12 @@ const CONFIG = {
     COMBO_MULTIPLIER: 1.5,
     
     // Animation timing (in milliseconds)
-    SHOW_COIN_TIME: 1500, // Time to show the coin initially
+    SHOW_COIN_TIME: 2500, // Increased time to show the coin initially
     PAUSE_BEFORE_SHUFFLE: 500, // Pause before shuffling starts
     PAUSE_AFTER_SHUFFLE: 300, // Pause after shuffling ends
+    
+    // Canvas settings
+    CANVAS_PADDING: 50,  // Padding from edge of canvas
     
     // 3D Scene settings
     CAMERA: {
@@ -47,49 +50,51 @@ const CONFIG = {
             SHUFFLE_SPEED: 0.8,
             SHUFFLE_DURATION: 2000,
             SHUFFLE_COMPLEXITY: 1,
-            MAX_HEIGHT: 0.8, // Max height during jumps
+            MIN_DISTANCE: 80,
         },
         2: { // Medium
             NUM_CUPS: 4,
             SHUFFLE_SPEED: 1.2,
             SHUFFLE_DURATION: 2500,
             SHUFFLE_COMPLEXITY: 2,
-            MAX_HEIGHT: 1.0,
+            MIN_DISTANCE: 90,
         },
         3: { // Hard
             NUM_CUPS: 5,
             SHUFFLE_SPEED: 1.6,
             SHUFFLE_DURATION: 3000,
             SHUFFLE_COMPLEXITY: 3,
-            MAX_HEIGHT: 1.2,
+            MIN_DISTANCE: 100,
         },
         4: { // Expert
             NUM_CUPS: 6,
             SHUFFLE_SPEED: 2,
             SHUFFLE_DURATION: 3500,
             SHUFFLE_COMPLEXITY: 4,
-            MAX_HEIGHT: 1.5,
+            MIN_DISTANCE: 110,
         }
     },
     
-    // Cup dimensions
+    // Cup dimensions and appearance (for 2D canvas)
     CUP: {
-        RADIUS_TOP: 0.5,    // Cup top radius
-        RADIUS_BOTTOM: 0.35, // Cup bottom radius
-        HEIGHT: 0.8,        // Cup height
-        SEGMENTS: 32,       // Geometry detail
-        COLOR: 0xDD0000,    // Red cups
-        HOVER_COLOR: 0xFF4444, // Lighter red for hover effect
-        LIFT_HEIGHT: 1.5,   // How high to lift the cup for reveal
+        WIDTH: 70,           // Cup width
+        HEIGHT: 90,          // Cup height
+        BOTTOM_WIDTH: 50,    // Width of cup bottom
+        COLOR: '#4285F4',    // Cup color - Google Blue
+        SHADOW: 'rgba(0,0,0,0.4)', // Cup shadow color
+        // 3D properties kept for compatibility
+        RADIUS_TOP: 0.5,    
+        RADIUS_BOTTOM: 0.35,
+        SEGMENTS: 32,
+        HOVER_COLOR: 0xFF4444,
+        LIFT_HEIGHT: 1.5,
     },
     
-    // Coin dimensions
+    // Coin dimensions and appearance
     COIN: {
-        RADIUS: 0.25,
-        HEIGHT: 0.05,
-        SEGMENTS: 32,
-        COLOR: 0xFFD700, // Gold
-        EDGE_COLOR: 0xDAA520, // Darker gold for edge
+        RADIUS: 25,          // Increased coin radius for better visibility
+        COLOR: '#FFC107',    // Brighter gold color
+        SHADOW: 'rgba(0,0,0,0.5)', // Darker shadow for better contrast
     },
     
     // Physics and Movement

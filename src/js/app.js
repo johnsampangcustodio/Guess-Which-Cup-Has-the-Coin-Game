@@ -5,6 +5,14 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Get canvas element
     const canvas = document.getElementById('game-canvas');
+    if (!canvas) {
+        alert("Game canvas element not found!");
+        return;
+    }
+    
+    // Configure canvas size to match display
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
     
     // Create game instance
     const game = new Game(canvas);
@@ -14,26 +22,31 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Set up button event listeners
     const startButton = document.getElementById('start-btn');
-    startButton.addEventListener('click', () => {
-        if (!game.gameActive) {
-            game.startGame();
-            startButton.textContent = 'Playing...';
-        }
-    });
+    if (startButton) {
+        startButton.addEventListener('click', () => {
+            if (!game.gameActive) {
+                game.startGame();
+            }
+        });
+    }
     
     // Handle difficulty change
     const difficultySelect = document.getElementById('difficulty');
-    difficultySelect.addEventListener('change', () => {
-        const level = parseInt(difficultySelect.value);
-        document.getElementById('level').textContent = `Level: ${level}`;
-    });
+    if (difficultySelect) {
+        difficultySelect.addEventListener('change', () => {
+            const level = parseInt(difficultySelect.value);
+            document.getElementById('level').textContent = `Level: ${level}`;
+        });
+    }
     
     // Check for high score in local storage
     const highScore = localStorage.getItem('highScore');
     if (highScore) {
         // Show high score
         const scoreElement = document.getElementById('score');
-        scoreElement.innerHTML = `Score: 0 <span style="font-size: 0.8em; opacity: 0.7;">(Best: ${highScore})</span>`;
+        if (scoreElement) {
+            scoreElement.innerHTML = `Score: 0 <span style="font-size: 0.8em; opacity: 0.7;">(Best: ${highScore})</span>`;
+        }
     }
     
     // Mobile-specific optimizations

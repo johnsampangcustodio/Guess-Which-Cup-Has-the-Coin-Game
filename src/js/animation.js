@@ -56,7 +56,19 @@ class Animation {
                 // Check if we've exceeded shuffle duration
                 const elapsed = timestamp - this.shuffleStartTime;
                 if (elapsed >= this.shuffleDuration) {
+                    // Ensure all cups are at their final positions
+                    while (this.currentMove < this.shuffleMoves.length) {
+                        const move = this.shuffleMoves[this.currentMove];
+                        this.cups[move.cupIndex].moveTo(move.x, move.y);
+                        this.currentMove++;
+                    }
+                    
+                    // Update cups one last time
+                    this.cups.forEach(cup => cup.update(deltaTime));
+                    
+                    // End shuffling
                     this.isShuffling = false;
+                    console.log("Shuffle animation complete");
                     resolve();
                     return;
                 }
