@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Guess Which Cup Has the Coin</title>
+    <link rel="stylesheet" href="src/css/styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>Guess Which Cup Has the Coin</h1>
+        
+        <div class="game-status">
+            <div id="score">Score: 0</div>
+            <div id="level">Level: 1</div>
+        </div>
+        
+        <div class="game-area">
+            <canvas id="game-canvas"></canvas>
+        </div>
+        
+        <div class="controls">
+            <button id="start-btn">Start Game</button>
+            <select id="difficulty">
+                <option value="1">Easy</option>
+                <option value="2">Medium</option>
+                <option value="3">Hard</option>
+                <option value="4">Expert</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Core modules -->
+    <script src="src/js/config.js"></script>
+    <script src="src/js/cup.js"></script>
+    <script src="src/js/animation.js"></script>
+    <script src="src/js/game.js"></script>
+    <script src="src/js/app.js"></script>
+</body>
+</html> 
