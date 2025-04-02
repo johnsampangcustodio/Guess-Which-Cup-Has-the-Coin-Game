@@ -6,9 +6,9 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    background-color: #f5f5f7;
-    color: #333;
+    font-family: 'Baloo 2', cursive;
+    background-color: #ffebf3; /* Soft pink background */
+    color: #6a4162; /* Darker purple text */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -21,26 +21,33 @@ body {
     width: 100%;
     max-width: 390px; /* iPhone 13/14 width */
     padding: 20px;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    background-color: #fff7fe; /* Very light pink background */
+    border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(253, 167, 223, 0.25);
     display: flex;
     flex-direction: column;
     gap: 20px;
+    border: 3px solid #ffd1ec; /* Pink border */
 }
 
 h1 {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     text-align: center;
     margin-bottom: 10px;
-    color: #1d1d1f;
+    color: #fa86c4; /* Cute pink */
+    text-shadow: 2px 2px 0px #ffebf3;
 }
 
 .game-status {
     display: flex;
     justify-content: space-between;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 600;
+    color: #9771a8; /* Purple */
+    background-color: #fbedff; /* Very light purple background */
+    padding: 10px 15px;
+    border-radius: 15px;
+    border: 2px dashed #d9bff0; /* Light purple dashed border */
 }
 
 .game-area {
@@ -51,14 +58,15 @@ h1 {
     position: relative;
 }
 
-#game-canvas {
+#phaser-game {
     width: 100%;
     height: 300px;
-    border-radius: 8px;
-    background: linear-gradient(to bottom, #87CEEB, #e6f7ff);
+    border-radius: 15px;
     overflow: hidden;
     position: relative;
     touch-action: manipulation; /* Prevents browser handling of pinches and zooms */
+    background-color: #fff0f6; /* Light pink */
+    border: 3px solid #ffcae5; /* Medium pink border */
 }
 
 .controls {
@@ -70,33 +78,45 @@ h1 {
 }
 
 button {
-    background-color: #0071e3;
+    background-color: #fa86c4; /* Cute pink */
     color: white;
     border: none;
     padding: 12px 24px;
     border-radius: 20px;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
+    font-family: 'Baloo 2', cursive;
+    box-shadow: 0 4px 0 #e461a5; /* Darker pink for 3D effect */
 }
 
 button:hover {
-    background-color: #0077ed;
+    background-color: #ff9ed2;
+    transform: translateY(-2px);
 }
 
 button:active {
-    background-color: #0062c3;
-    transform: scale(0.98);
+    background-color: #e461a5;
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #e461a5;
 }
 
 select {
-    padding: 10px 15px;
-    border-radius: 20px;
-    border: 1px solid #c7c7cc;
+    padding: 12px 15px;
+    border-radius: 15px;
+    border: 2px solid #d9bff0; /* Light purple border */
     font-size: 0.9rem;
-    background-color: #fff;
+    background-color: #fbedff; /* Very light purple */
     cursor: pointer;
+    font-family: 'Baloo 2', cursive;
+    color: #6a4162;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239771a8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 1em;
+    padding-right: 30px;
 }
 
 /* Message overlay */
@@ -110,18 +130,26 @@ select {
     font-weight: bold;
     text-align: center;
     z-index: 10;
-    transition: opacity 0.3s;
+    transition: opacity 0.3s, transform 0.3s;
     opacity: 0;
-    background-color: rgba(0, 123, 255, 0.9);
+    background-color: rgba(255, 171, 205, 0.95);
     color: white;
     pointer-events: none;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 15px rgba(253, 167, 223, 0.4);
+    border: 2px solid #ffcae5;
+}
+
+#game-message.visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.05);
 }
 
 /* iPhone-specific optimizations */
 @media screen and (max-width: 430px) {
     .game-container {
         box-shadow: none;
-        border-radius: 0;
+        border-radius: 20px;
         min-height: 100vh;
         padding: 30px 20px;
     }

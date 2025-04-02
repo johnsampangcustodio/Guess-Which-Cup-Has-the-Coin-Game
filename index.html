@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Guess Which Cup Has the Coin</title>
+    <title>Kawaii Cup and Coin Game</title>
     <link rel="stylesheet" href="src/css/styles.css">
-    <!-- Three.js library -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-    <!-- OrbitControls for camera manipulation -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.min.js"></script>
-    <!-- GSAP for animations -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- Phaser library -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <!-- Google Fonts - Cute font for kawaii style -->
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="game-container">
-        <h1>Guess Which Cup Has the Coin</h1>
+        <h1>Kawaii Cup Game</h1>
         
         <div class="game-status">
             <div id="score">Score: 0</div>
@@ -22,7 +20,7 @@
         </div>
         
         <div class="game-area">
-            <div id="game-canvas"></div>
+            <div id="phaser-game"></div>
         </div>
         
         <div class="controls">
@@ -37,9 +35,8 @@
     </div>
 
     <!-- Game modules -->
-    <script src="src/js/config.js"></script>
-    <script src="src/js/cup3d.js"></script>
-    <script src="src/js/game3d.js"></script>
-    <script src="src/js/app3d.js"></script>
+    <script src="src/js/config-phaser.js"></script>
+    <script src="src/js/cup-phaser.js"></script>
+    <script src="src/js/game-phaser.js"></script>
 </body>
 </html> 
