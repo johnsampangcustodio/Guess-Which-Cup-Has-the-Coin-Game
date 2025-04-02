@@ -17,6 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Create game instance
     const game = new Game(canvas);
     
+    // Initialize game (loads audio and sets up controls)
+    game.init();
+    
     // Start game loop
     game.start();
     
@@ -35,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (difficultySelect) {
         difficultySelect.addEventListener('change', () => {
             const level = parseInt(difficultySelect.value);
-            document.getElementById('level').textContent = `Level: ${level}`;
+            document.getElementById('level').textContent = `LEVEL: ${level}`;
         });
     }
     
@@ -45,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Show high score
         const scoreElement = document.getElementById('score');
         if (scoreElement) {
-            scoreElement.innerHTML = `Score: 0 <span style="font-size: 0.8em; opacity: 0.7;">(Best: ${highScore})</span>`;
+            scoreElement.innerHTML = `SCORE: 0 <span style="font-size: 0.8em; opacity: 0.7;">(BEST: ${highScore})</span>`;
         }
     }
     
@@ -65,5 +68,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Add welcome message
-    game.showMessage('Tap Start Game to play!', '#007bff');
+    game.showMessage('TAP START GAME TO PLAY!', '#421C14');
 }); 

@@ -16,6 +16,16 @@ class Game {
         this.canSelect = false;
         this.selectionButtons = []; // Added to track selection buttons
         
+        // Time tracking
+        this.lastTime = 0;
+        this._animationRunning = false;
+        
+        // Audio setup
+        this.bgMusic = null;
+        this.soundEffects = {};
+        this.audioLoaded = false;
+        this.isMuted = false;
+        
         // Resize canvas to match displayed size
         this.resizeCanvas();
         
@@ -93,6 +103,9 @@ class Game {
         console.log(`Cup ${index + 1} selected, coin is under cup ${this.coinIndex + 1}`);
         this.canSelect = false;
         
+        // Play select sound
+        this.playSound('select');
+        
         // Hide selection buttons
         this.hideSelectionButtons();
         
@@ -109,10 +122,16 @@ class Game {
             this.updateScoreDisplay();
             this.showMessage('YOU FOUND THE GEM! +' + CONFIG.POINTS_PER_WIN + ' POINTS', '#2E86C1');
             
+            // Play success sound
+            this.playSound('correct');
+            
             // Add a visual celebration effect
             this.showCelebration();
         } else {
             this.showMessage('THE GEM WAS HIDING HERE', '#421C14');
+            
+            // Play wrong sound
+            this.playSound('wrong');
             
             // Reveal the correct cup
             this.cups[this.coinIndex].reveal();
@@ -131,27 +150,38 @@ class Game {
      */
     async startGame() {
         try {
-            // Hide any previous messages
-            this.hideMessage();
+            // Start background music if audio is loaded
+            if (this.bgMusic && this.audioLoaded) {
+                // For better user experience, we only need to play once when the 
+                // user interacts with the game (autoplay restrictions)
+                if (this.bgMusic.paused) {
+                    console.log('Attempting to play background music');
+                    const playPromise = this.bgMusic.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise
+                            .then(() => {
+                                console.log('Background music started successfully');
+                            })
+                            .catch(error => {
+                                console.warn('Error playing background music:', error);
+                                // Don't let audio issues stop the game
+                            });
+                    }
+                }
+            }
             
-            // Reset game state
+            // Rest of the startGame method
+            this.hideMessage();
             this.gameActive = true;
             this.canSelect = false;
             document.getElementById('start-btn').disabled = true;
             document.getElementById('start-btn').textContent = 'PLAYING...';
-            
-            // Hide any existing selection buttons
             this.hideSelectionButtons();
-            
-            // Get difficulty level
             this.difficulty = parseInt(document.getElementById('difficulty').value);
             document.getElementById('level').textContent = `LEVEL: ${this.difficulty}`;
-            
-            // Create cups based on difficulty
             const numCups = CONFIG.DIFFICULTY[this.difficulty].NUM_CUPS;
             this.createCups(numCups);
-            
-            // Randomly decide which cup has the coin
             this.coinIndex = Math.floor(Math.random() * numCups);
             this.cups[this.coinIndex].hasCoin = true;
             
@@ -179,7 +209,6 @@ class Game {
                 // Wait for cups to be hidden
                 setTimeout(() => {
                     // Start the shuffle animation
-                    // The simpleShuffle method will handle creating selection buttons when done
                     this.simpleShuffle();
                 }, 500);
             }, 2000);
@@ -196,6 +225,9 @@ class Game {
         const canvasHeight = this.canvas.height;
         const padding = 50;
         const cupWidth = CONFIG.CUP.WIDTH;
+        
+        // Play shuffle sound
+        this.playSound('shuffle');
         
         // Show shuffling message
         this.showMessage('WATCH THE CUPS SHUFFLE', '#421C14');
@@ -740,5 +772,212 @@ class Game {
     start() {
         // Start render loop
         this.render();
+    }
+    
+    /**
+     * Load audio assets for the game
+     */
+    loadAudio() {
+        try {
+            // Background music - use the existing file
+            this.bgMusic = new Audio('src/audio/bgMusic.mp3');
+            this.bgMusic.loop = true;
+            this.bgMusic.volume = 0.5;
+            
+            // Sound effects with fallbacks
+            const createAudioWithFallback = (path) => {
+                const audio = new Audio();
+                audio.src = path;
+                audio.onerror = () => {
+                    console.warn(`Could not load audio file: ${path}`);
+                    // Don't set audioLoaded to false, just handle this specific file
+                    audio.src = ''; // Clear source to avoid further errors
+                };
+                return audio;
+            };
+            
+            // Setup sound effects
+            this.soundEffects = {
+                correct: createAudioWithFallback('src/audio/correct.mp3'),
+                wrong: createAudioWithFallback('src/audio/wrong.mp3'),
+                shuffle: createAudioWithFallback('src/audio/shuffle.mp3'),
+                select: createAudioWithFallback('src/audio/select.mp3')
+            };
+            
+            // Set volumes for sound effects
+            Object.values(this.soundEffects).forEach(sound => {
+                sound.volume = 0.6;
+            });
+            
+            // Preload bgMusic specifically
+            this.bgMusic.addEventListener('canplaythrough', () => {
+                console.log('Background music loaded successfully');
+            });
+            
+            this.bgMusic.addEventListener('error', (e) => {
+                console.error('Error loading background music:', e);
+            });
+            
+            // Mark audio as loaded
+            this.audioLoaded = true;
+            
+            console.log('Audio assets loading initiated');
+        } catch (error) {
+            console.error('Error setting up audio assets:', error);
+            // Allow game to continue without audio
+            this.audioLoaded = false;
+        }
+    }
+    
+    /**
+     * Create audio control UI
+     */
+    createAudioControls() {
+        const gameContainer = document.getElementById('game-container');
+        
+        // Create audio control container
+        const audioControls = document.createElement('div');
+        audioControls.className = 'audio-controls';
+        audioControls.style.position = 'absolute';
+        audioControls.style.top = '10px';
+        audioControls.style.right = '10px';
+        audioControls.style.zIndex = '1000';
+        audioControls.style.display = 'flex';
+        audioControls.style.alignItems = 'center';
+        audioControls.style.gap = '10px';
+        
+        // Create mute toggle button
+        const muteBtn = document.createElement('button');
+        muteBtn.id = 'mute-btn';
+        muteBtn.innerHTML = '🔊';
+        muteBtn.style.width = '40px';
+        muteBtn.style.height = '40px';
+        muteBtn.style.borderRadius = '50%';
+        muteBtn.style.backgroundColor = '#421C14';
+        muteBtn.style.color = 'white';
+        muteBtn.style.border = 'none';
+        muteBtn.style.cursor = 'pointer';
+        muteBtn.style.display = 'flex';
+        muteBtn.style.alignItems = 'center';
+        muteBtn.style.justifyContent = 'center';
+        muteBtn.style.fontSize = '18px';
+        muteBtn.style.boxShadow = '0 3px 0 #2C1208';
+        
+        // Add click handler for mute button
+        muteBtn.addEventListener('click', () => {
+            this.toggleMute();
+            muteBtn.innerHTML = this.isMuted ? '🔇' : '🔊';
+        });
+        
+        // Create volume slider
+        const volumeSlider = document.createElement('input');
+        volumeSlider.type = 'range';
+        volumeSlider.id = 'volume-slider';
+        volumeSlider.min = '0';
+        volumeSlider.max = '100';
+        volumeSlider.value = '50';
+        volumeSlider.style.width = '80px';
+        volumeSlider.style.accentColor = '#421C14';
+        
+        // Add input handler for volume slider
+        volumeSlider.addEventListener('input', (e) => {
+            const volume = e.target.value / 100;
+            this.setVolume(volume);
+        });
+        
+        // Add controls to the container
+        audioControls.appendChild(muteBtn);
+        audioControls.appendChild(volumeSlider);
+        
+        // Add the container to the game
+        gameContainer.appendChild(audioControls);
+    }
+    
+    /**
+     * Toggle mute state for all audio
+     */
+    toggleMute() {
+        this.isMuted = !this.isMuted;
+        
+        if (this.bgMusic) {
+            this.bgMusic.muted = this.isMuted;
+        }
+        
+        Object.values(this.soundEffects).forEach(sound => {
+            sound.muted = this.isMuted;
+        });
+    }
+    
+    /**
+     * Set volume for all audio
+     */
+    setVolume(volume) {
+        if (this.bgMusic) {
+            this.bgMusic.volume = volume;
+        }
+        
+        Object.values(this.soundEffects).forEach(sound => {
+            sound.volume = volume * 0.8; // Slightly lower than music
+        });
+    }
+    
+    /**
+     * Play a sound effect by name
+     */
+    playSound(name) {
+        if (!this.audioLoaded || this.isMuted) return;
+        
+        const sound = this.soundEffects[name];
+        if (sound) {
+            // Reset the sound to start from beginning
+            sound.currentTime = 0;
+            sound.play().catch(error => {
+                console.warn('Error playing sound:', error);
+            });
+        }
+    }
+    
+    /**
+     * Initialize the game
+     */
+    init() {
+        // Set up canvas size
+        this.resizeCanvas();
+        window.addEventListener('resize', () => this.resizeCanvas());
+        
+        // Add event listener for the start button
+        document.getElementById('start-btn').addEventListener('click', () => this.startGame());
+        
+        // Load audio assets
+        this.loadAudio();
+        
+        // Initial score display
+        this.updateScoreDisplay();
+        
+        // Start animation loop
+        this.animate();
+        
+        // Add audio control UI
+        this.createAudioControls();
+    }
+    
+    /**
+     * Animation loop
+     */
+    animate(timestamp) {
+        if (!this.lastTime) this.lastTime = timestamp;
+        const deltaTime = timestamp - this.lastTime;
+        this.lastTime = timestamp;
+        
+        // Update cups
+        for (let cup of this.cups) {
+            cup.update(deltaTime);
+        }
+        
+        // Render frame
+        this.render();
+        
+        // Continue animation loop
+        requestAnimationFrame(this.animate.bind(this));
     }
 } 

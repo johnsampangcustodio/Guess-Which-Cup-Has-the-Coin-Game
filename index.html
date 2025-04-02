@@ -33,6 +33,7 @@
             transform: translateY(0);
             animation: float 6s ease-in-out infinite;
             border: 2px solid #E69DB8;
+            position: relative;
         }
         
         @keyframes float {
@@ -170,6 +171,56 @@
             background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23421C14"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>') no-repeat center center;
         }
         
+        .audio-controls {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 100;
+        }
+        
+        .audio-controls button {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 18px;
+        }
+        
+        .audio-controls input[type="range"] {
+            width: 80px;
+            height: 5px;
+            -webkit-appearance: none;
+            background: #F1E7E7;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .audio-controls input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #421C14;
+            cursor: pointer;
+            box-shadow: -100px 0 0 100px #F8AD6B;
+        }
+        
+        .audio-controls input[type="range"]::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #421C14;
+            cursor: pointer;
+            border: none;
+            box-shadow: -100px 0 0 100px #F8AD6B;
+        }
+        
         @media (max-width: 600px) {
             #game-container {
                 width: 95%;
@@ -192,6 +243,21 @@
             button, select {
                 width: 100%;
                 max-width: 250px;
+            }
+            
+            .audio-controls {
+                top: 5px;
+                right: 5px;
+            }
+            
+            .audio-controls button {
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
+            }
+            
+            .audio-controls input[type="range"] {
+                width: 60px;
             }
         }
     </style>
