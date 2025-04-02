@@ -6,7 +6,7 @@
 }
 
 body {
-    font-family: 'Baloo 2', cursive;
+    font-family: Arial, Helvetica, sans-serif;
     background-color: #F1E7E7; /* Updated to new color scheme */
     color: #825765; /* Darker complementary color */
     display: flex;
@@ -88,7 +88,7 @@ button {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
-    font-family: 'Baloo 2', cursive;
+    font-family: Arial, Helvetica, sans-serif;
     box-shadow: 0 4px 0 #c97d96; /* Darker shade for 3D effect */
 }
 
@@ -110,7 +110,7 @@ select {
     font-size: 0.9rem;
     background-color: #FFFECE; /* Updated to new color scheme */
     cursor: pointer;
-    font-family: 'Baloo 2', cursive;
+    font-family: Arial, Helvetica, sans-serif;
     color: #825765;
     appearance: none;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23E69DB8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");

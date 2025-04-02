@@ -443,7 +443,7 @@ class KawaiiMessage extends Phaser.GameObjects.Container {
         
         // Create message text
         this.text = scene.add.text(0, 0, '', {
-            fontFamily: '"Baloo 2", cursive',
+            fontFamily: 'Arial, sans-serif',
             fontSize: '18px',
             color: '#FFFFFF',
             stroke: '#c97d96',

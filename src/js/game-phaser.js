@@ -12,11 +12,9 @@ class CupsAndCoinsGame {
         this.currentRound = 0;
         this.roundsPerGame = CONFIG.GAME.ROUNDS_PER_GAME;
         this.bgMusic = null;
-        this.isInitialPreview = true;
-        this.assetsLoaded = false;
         
-        // Create loading overlay
-        this.createLoadingOverlay();
+        // Simple loading indicator
+        this.showSimpleLoadingMessage();
         
         // Configure Phaser game
         this.initPhaser();
@@ -26,157 +24,35 @@ class CupsAndCoinsGame {
     }
     
     /**
-     * Create a loading overlay that sits on top of the game
+     * Show a simple loading message
      */
-    createLoadingOverlay() {
-        // Create loading overlay container
-        const loadingOverlay = document.createElement('div');
-        loadingOverlay.id = 'loading-overlay';
-        loadingOverlay.style.position = 'absolute';
-        loadingOverlay.style.top = '0';
-        loadingOverlay.style.left = '0';
-        loadingOverlay.style.width = '100%';
-        loadingOverlay.style.height = '100%';
-        loadingOverlay.style.backgroundColor = '#F1E7E7';
-        loadingOverlay.style.display = 'flex';
-        loadingOverlay.style.flexDirection = 'column';
-        loadingOverlay.style.justifyContent = 'center';
-        loadingOverlay.style.alignItems = 'center';
-        loadingOverlay.style.zIndex = '100';
-        loadingOverlay.style.borderRadius = '15px';
+    showSimpleLoadingMessage() {
+        const loadingDiv = document.createElement('div');
+        loadingDiv.id = 'simple-loading';
+        loadingDiv.style.position = 'absolute';
+        loadingDiv.style.top = '50%';
+        loadingDiv.style.left = '50%';
+        loadingDiv.style.transform = 'translate(-50%, -50%)';
+        loadingDiv.style.padding = '10px 20px';
+        loadingDiv.style.backgroundColor = '#E69DB8';
+        loadingDiv.style.color = 'white';
+        loadingDiv.style.borderRadius = '10px';
+        loadingDiv.style.fontFamily = 'Arial, sans-serif';
+        loadingDiv.style.zIndex = '1000';
+        loadingDiv.textContent = 'Loading...';
         
-        // Loading title
-        const loadingTitle = document.createElement('h2');
-        loadingTitle.textContent = 'LOADING GAME';
-        loadingTitle.style.color = '#E69DB8';
-        loadingTitle.style.fontFamily = '"Baloo 2", cursive';
-        loadingTitle.style.marginBottom = '20px';
+        // Add to document body to ensure it's visible
+        document.body.appendChild(loadingDiv);
         
-        // Add spinner animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-            
-            @keyframes bounce {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-10px); }
-            }
-            
-            .loading-item {
-                animation: bounce 1.2s ease infinite;
-                margin: 0 5px;
-                width: 12px;
-                height: 12px;
-                border-radius: 50%;
-                background-color: #E69DB8;
-                display: inline-block;
-            }
-            
-            .loading-item:nth-child(2) {
-                animation-delay: 0.2s;
-            }
-            
-            .loading-item:nth-child(3) {
-                animation-delay: 0.4s;
-            }
-        `;
-        document.head.appendChild(style);
-        
-        // Loading progress
-        const progressContainer = document.createElement('div');
-        progressContainer.style.width = '200px';
-        progressContainer.style.height = '30px';
-        progressContainer.style.backgroundColor = '#FFD0C7';
-        progressContainer.style.borderRadius = '15px';
-        progressContainer.style.margin = '20px 0';
-        progressContainer.style.overflow = 'hidden';
-        
-        const progressBar = document.createElement('div');
-        progressBar.id = 'loading-progress-bar';
-        progressBar.style.width = '0%';
-        progressBar.style.height = '100%';
-        progressBar.style.backgroundColor = '#E69DB8';
-        progressBar.style.transition = 'width 0.3s ease';
-        
-        // Loading status text
-        const loadingStatus = document.createElement('div');
-        loadingStatus.id = 'loading-status';
-        loadingStatus.textContent = 'Preparing cups and coins...';
-        loadingStatus.style.color = '#825765';
-        loadingStatus.style.fontFamily = '"Baloo 2", cursive';
-        loadingStatus.style.fontSize = '14px';
-        loadingStatus.style.marginTop = '10px';
-        
-        // Bouncing dots
-        const dotsContainer = document.createElement('div');
-        dotsContainer.style.marginTop = '15px';
-        
-        for (let i = 0; i < 3; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'loading-item';
-            dotsContainer.appendChild(dot);
-        }
-        
-        // Add elements to overlay
-        progressContainer.appendChild(progressBar);
-        loadingOverlay.appendChild(loadingTitle);
-        loadingOverlay.appendChild(progressContainer);
-        loadingOverlay.appendChild(loadingStatus);
-        loadingOverlay.appendChild(dotsContainer);
-        
-        // Add overlay to game container immediately
-        const gameContainer = document.getElementById('phaser-game');
-        if (gameContainer) {
-            gameContainer.style.position = 'relative';
-            gameContainer.appendChild(loadingOverlay);
-        } else {
-            // If game container isn't ready yet, try once more after a short delay
-            setTimeout(() => {
-                const container = document.getElementById('phaser-game');
-                if (container) {
-                    container.style.position = 'relative';
-                    container.appendChild(loadingOverlay);
-                }
-            }, 50);
-        }
-        
-        // Store references
-        this.loadingOverlay = loadingOverlay;
-        this.progressBar = progressBar;
-        this.loadingStatus = loadingStatus;
+        this.loadingDiv = loadingDiv;
     }
     
     /**
-     * Update loading progress
+     * Hide the loading message
      */
-    updateLoadingProgress(percent, status) {
-        if (this.progressBar) {
-            this.progressBar.style.width = `${percent}%`;
-        }
-        
-        if (this.loadingStatus && status) {
-            this.loadingStatus.textContent = status;
-        }
-    }
-    
-    /**
-     * Hide loading overlay when game is ready
-     */
-    hideLoadingOverlay() {
-        if (this.loadingOverlay) {
-            // Fade out animation
-            this.loadingOverlay.style.transition = 'opacity 0.5s ease';
-            this.loadingOverlay.style.opacity = '0';
-            
-            // Remove after animation
-            setTimeout(() => {
-                if (this.loadingOverlay && this.loadingOverlay.parentNode) {
-                    this.loadingOverlay.parentNode.removeChild(this.loadingOverlay);
-                }
-            }, 300); // Reduced from 500ms
+    hideLoadingMessage() {
+        if (this.loadingDiv && this.loadingDiv.parentNode) {
+            this.loadingDiv.parentNode.removeChild(this.loadingDiv);
         }
     }
     
@@ -197,13 +73,7 @@ class CupsAndCoinsGame {
                 update: this.update.bind(this)
             },
             audio: {
-                disableWebAudio: false,
-                noAudio: false
-            },
-            render: {
-                pixelArt: false,
-                antialias: true,
-                roundPixels: false
+                disableWebAudio: false
             }
         };
         
@@ -225,7 +95,6 @@ class CupsAndCoinsGame {
         
         // Listen for new game button
         document.getElementById('new-game').addEventListener('click', () => {
-            // Always allow starting the game, even if assets aren't fully loaded
             this.startNewGame();
             
             // Try to play music if it's loaded
@@ -241,26 +110,18 @@ class CupsAndCoinsGame {
     preload() {
         this.scene = this.gamePhaser.scene.scenes[0];
         
-        // Update loading progress
-        this.updateLoadingProgress(20, "Loading game assets...");
-        
-        // Fast-track loading by not waiting for music
-        this.scene.load.audio('bgMusic', 'src/media/bgMusic.mp3');
-        
-        // Mark music loading as optional - don't block game start
-        this.scene.load.once('filecomplete-audio-bgMusic', () => {
-            console.log("Music loaded successfully");
-        });
-        
-        // Continue even if music fails to load
-        this.scene.load.once('loaderror', (fileObj) => {
-            console.warn("Asset failed to load:", fileObj.key);
-            // Continue with game setup anyway
-            this.updateLoadingProgress(80, "Setting up game...");
-        });
-        
-        // Speed up by not waiting for all assets
-        this.updateLoadingProgress(50, "Preparing game...");
+        try {
+            // Load music with correct path
+            const musicPath = './src/media/bgMusic.mp3';
+            this.scene.load.audio('bgMusic', musicPath);
+            
+            // Handle loading errors
+            this.scene.load.once('loaderror', (fileObj) => {
+                console.warn("Failed to load:", fileObj.key);
+            });
+        } catch (error) {
+            console.error("Error in preload:", error);
+        }
     }
     
     /**
@@ -268,26 +129,9 @@ class CupsAndCoinsGame {
      */
     create() {
         console.log("Game scene created");
-        this.updateLoadingProgress(80, "Setting up game...");
-        
-        // Set up game immediately without waiting for fonts
-        this.setupGame();
-        
-        // Load fonts in background
-        WebFont.load({
-            google: {
-                families: ['Baloo 2:400,600,700']
-            },
-            active: () => {
-                console.log("Fonts loaded");
-            },
-            inactive: () => {
-                console.warn("Fonts failed to load");
-            }
-        });
         
         try {
-            // Create background music if possible
+            // Create background music if loaded
             this.bgMusic = this.scene.sound.add('bgMusic', {
                 volume: 0.5,
                 loop: true
@@ -296,24 +140,19 @@ class CupsAndCoinsGame {
             console.warn("Background music not available:", error);
         }
         
-        // Mark game as loaded
-        this.assetsLoaded = true;
-        this.updateLoadingProgress(100, "Game Ready!");
+        // Initialize the game
+        this.setupGame();
         
-        // Hide loading overlay after a very short delay
-        setTimeout(() => {
-            this.hideLoadingOverlay();
-        }, 200); // Reduced from 1000ms
+        // Hide the loading message
+        this.hideLoadingMessage();
     }
     
     /**
-     * Play background music with fade-in effect
+     * Play background music
      */
     playBackgroundMusic() {
         try {
             if (this.bgMusic && !this.bgMusic.isPlaying) {
-                console.log("Playing background music");
-                this.bgMusic.setVolume(0.5);
                 this.bgMusic.play();
             }
         } catch (error) {
@@ -362,13 +201,10 @@ class CupsAndCoinsGame {
             this.isShuffling = false;
             this.isGameOver = false;
             
-            // Show preview if cups loaded successfully
-            if (this.cups && this.cups.length > 0) {
-                this.showCoinBriefly();
-            }
+            // Show initial coin preview
+            this.showCoinBriefly();
         } catch (error) {
             console.error("Error setting up game:", error);
-            this.updateLoadingProgress(100, "Error loading game. Try refreshing.");
         }
     }
     
@@ -376,8 +212,6 @@ class CupsAndCoinsGame {
      * Show coin briefly as a preview
      */
     showCoinBriefly() {
-        console.log("Showing coin preview");
-        
         // Find cup with coin
         const coinCup = this.cups.find(cup => cup.hasCoin);
         
@@ -392,8 +226,6 @@ class CupsAndCoinsGame {
             this.scene.time.delayedCall(CONFIG.ANIMATION.SHOW_COIN_TIME, () => {
                 coinCup.lower();
             });
-        } else {
-            console.error("No coin cup found during preview");
         }
     }
     
@@ -406,7 +238,7 @@ class CupsAndCoinsGame {
         
         // Score text
         this.scoreText = this.scene.add.text(width - 10, 10, 'SCORE: 0', {
-            fontFamily: '"Baloo 2", cursive',
+            fontFamily: 'Arial, sans-serif',
             fontSize: '18px',
             color: '#825765',
             fontWeight: 'bold'
@@ -414,7 +246,7 @@ class CupsAndCoinsGame {
         
         // Rounds text
         this.roundsText = this.scene.add.text(10, 10, 'ROUND: 0/' + this.roundsPerGame, {
-            fontFamily: '"Baloo 2", cursive',
+            fontFamily: 'Arial, sans-serif',
             fontSize: '18px',
             color: '#825765',
             fontWeight: 'bold'
